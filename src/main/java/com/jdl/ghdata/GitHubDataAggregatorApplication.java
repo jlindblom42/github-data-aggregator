@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GithubDataAggregatorApplication {
+public class GitHubDataAggregatorApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GithubDataAggregatorApplication.class, args);
+        SpringApplication.run(GitHubDataAggregatorApplication.class, args);
     }
 
 }

@@ -1,3 +1,7 @@
 spring:
   application:
     name: github-data-aggregator
+
+github:
+  api:
+    base-url: https://api.github.com

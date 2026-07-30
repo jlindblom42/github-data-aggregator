@@ -8,17 +8,17 @@ below (that also serves as an example):
 
 ```json
 {
-  user_name: "octocat",
-  display_name: "The Octocat",
-  avatar: "https://avatars.githubusercontent.com/u/583231?v=4",
-  geo_location: "San Francisco",
-  email: null,
-  url: "https://api.github.com/users/octocat",
-  created_at: "Tue, 25 Jan 2011 18:44:36 GMT",
-  repos: [
+  "user_name": "octocat",
+  "display_name": "The Octocat",
+  "avatar": "https://avatars.githubusercontent.com/u/583231?v=4",
+  "geo_location": "San Francisco",
+  "email": null,
+  "url": "https://api.github.com/users/octocat",
+  "created_at": "Tue, 25 Jan 2011 18:44:36 GMT",
+  "repos": [
     {
-      name: "boysenberry-repo-1",
-      url: "https://api.github.com/repos/octocat/boysenberry-repo-1"
+      "name": "boysenberry-repo-1",
+      "url": "https://api.github.com/repos/octocat/boysenberry-repo-1"
     }
   ]
 }

@@ -1,4 +1,4 @@
-package com.jdl.ghdata.dto;
+package com.jdl.ghdata.core.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -16,8 +16,5 @@ public record UserReposResponseDto(
         String url,
         @JsonProperty("created_at")
         String createdAt,
-        List<Repo> repos) {
-
-    public record Repo(String name, String url) {
-    }
+        List<UserRepoDto> repos) {
 }
