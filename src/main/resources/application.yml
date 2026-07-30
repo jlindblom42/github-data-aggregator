@@ -2,6 +2,10 @@ spring:
   application:
     name: github-data-aggregator
 
+logging:
+  level:
+    com.jdl.ghdata: info
+
 github:
   api:
     base-url: https://api.github.com

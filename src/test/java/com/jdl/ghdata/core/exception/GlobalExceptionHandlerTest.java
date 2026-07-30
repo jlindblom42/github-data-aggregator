@@ -1,0 +1,84 @@
+package com.jdl.ghdata.core.exception;
+
+import com.jdl.ghdata.core.controller.UserController;
+import com.jdl.ghdata.core.service.UserService;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
+
+import static org.mockito.BDDMockito.given;
+
+@WebMvcTest(UserController.class)
+class GlobalExceptionHandlerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private UserService userService;
+
+    @Test
+    void notFoundFromGitHubApi_returns404() throws Exception {
+        given(userService.getUserAndUserRepos("octocat")).willThrow(
+                HttpClientErrorException.create(HttpStatus.NOT_FOUND, "Not Found", HttpHeaders.EMPTY, null, null));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/octocat"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(404))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Not Found"));
+    }
+
+    @Test
+    void otherClientErrorFromGitHubApi_returns502() throws Exception {
+        given(userService.getUserAndUserRepos("octocat")).willThrow(
+                HttpClientErrorException.create(HttpStatus.FORBIDDEN, "Forbidden", HttpHeaders.EMPTY, null, null));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/octocat"))
+                .andExpect(MockMvcResultMatchers.status().isBadGateway())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(502));
+    }
+
+    @Test
+    void serverErrorFromGitHubApi_returns502() throws Exception {
+        given(userService.getUserAndUserRepos("octocat")).willThrow(
+                HttpServerErrorException.create(HttpStatus.SERVICE_UNAVAILABLE, "Service Unavailable", HttpHeaders.EMPTY, null, null));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/octocat"))
+                .andExpect(MockMvcResultMatchers.status().isBadGateway())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(502));
+    }
+
+    @Test
+    void restClientCommunicationFailure_returns503() throws Exception {
+        given(userService.getUserAndUserRepos("octocat")).willThrow(
+                new ResourceAccessException("Connection refused"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/octocat"))
+                .andExpect(MockMvcResultMatchers.status().isServiceUnavailable())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(503));
+    }
+
+    @Test
+    void unexpectedException_returns500() throws Exception {
+        given(userService.getUserAndUserRepos("octocat")).willThrow(
+                new RuntimeException("boom"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/octocat"))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(500));
+    }
+}
