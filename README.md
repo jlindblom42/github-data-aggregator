@@ -38,3 +38,23 @@ The response above is produced by calling the username against GitHub's user and
 - Java 21
 - Spring Boot
 - Maven
+
+## Scripts
+
+### Install Maven
+
+```bash
+./mvnw clean install
+```
+
+### Run Application
+
+```bash
+./mvnw spring-boot:run
+```
+
+### Run Tests
+
+```bash
+./mvnw test
+```
