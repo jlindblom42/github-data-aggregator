@@ -26,6 +26,67 @@ below (that also serves as an example):
 
 The response above is produced by calling the username against GitHub's user and repos APIs, then merging the results.
 
+## API Usage
+
+### Get user and repos
+
+Retrieves a GitHub user's profile combined with their public repositories.
+
+```
+GET /users/{username}
+```
+
+**Path parameters**
+
+| Name       | Description                     |
+|------------|---------------------------------|
+| `username` | The GitHub username to look up. |
+
+**Example request**
+
+```bash
+curl.exe -s http://localhost:8080/users/octocat | ConvertFrom-Json | ConvertTo-Json -Depth 100
+```
+
+**Example response** — `200 OK`
+
+```json
+{
+  "user_name": "octocat",
+  "display_name": "The Octocat",
+  "avatar": "https://avatars.githubusercontent.com/u/583231?v=4",
+  "geo_location": "San Francisco",
+  "email": null,
+  "url": "https://api.github.com/users/octocat",
+  "created_at": "Tue, 25 Jan 2011 18:44:36 GMT",
+  "repos": [
+    {
+      "name": "boysenberry-repo-1",
+      "url": "https://api.github.com/repos/octocat/boysenberry-repo-1"
+    }
+  ]
+}
+```
+
+**Error responses**
+
+Errors are returned as JSON in the following structure:
+
+```json
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "The requested GitHub resource was not found."
+}
+```
+
+| Status | Condition                                                       |
+|--------|-----------------------------------------------------------------|
+| `404`  | The GitHub user does not exist (or the resource was not found). |
+| `502`  | GitHub rejected the request or returned a server error.         |
+| `503`  | The GitHub API could not be reached.                            |
+| `500`  | An unexpected error occurred.                                   |
+
 ## Data sources
 
 - Getting started: https://docs.github.com/en/rest/guides/getting-started-with-the-rest-api
