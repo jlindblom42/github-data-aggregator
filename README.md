@@ -151,3 +151,12 @@ validation/confirmation from the customer as to what they're expecting for unhap
 I've deliberately omitted retryable considerations out of mindfulness for rate limiting. May want to consider retrying
 for 502, 503, 504. GitHub hasn't had a great track record for outages lately so this may rise in priority if it becomes
 a frequent enough issue.
+
+## Future thoughts
+
+I didn't want to go too crazy with this out of respect for time, but there are a couple items that I would have looked at implementing next:
+* It wasn't requested by the customer but some form of authentication would be desirable from our perspective, as it would help gate the API to only the authorized users we have approved.  I.e. someone wouldn't be able to exhaust our rate limit constraints maliciously.
+* Swagger/OpenAPI Docs would have been a great add for the customer's benefit.  Gives them a UI that they can refer to for API documentation and testing.
+* Validation that the GitHub user exists as a first step would be helpful, if such an API/methodology exists.  I have to imagine it does in some form, just didn't see an easy way with the API calls targeted.
+* Exposing an API client module would have been a nice add assuming the customer is amenable to a SDK artifact as a deliverable.  Would have leaned on feign client as that's what I have the most experience with.
+* Need to confirm with customer that the caching considerations are sufficient for their purposes.  They may need something that's more "realtime" than the 1 minute ttl we put in place initially. 
