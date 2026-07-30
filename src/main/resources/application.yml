@@ -5,3 +5,6 @@ spring:
 github:
   api:
     base-url: https://api.github.com
+    cache:
+      ttl: PT1M
+      max-size: 1000
