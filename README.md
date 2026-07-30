@@ -58,3 +58,11 @@ The response above is produced by calling the username against GitHub's user and
 ```bash
 ./mvnw test
 ```
+
+## Decision Log
+
+Architecture is fairly cut-and-dry Spring MVC with one nuance, I separated out "core" from "githubapi" to better separate
+the dto's primarily.  Maybe overkill right now, but has maintenance benefits long-term.  Alternative would have been 
+to separate from within the component packages themselves (e.g. `dto/githubapi` and `dto/core`.  
+
+Client

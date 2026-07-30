@@ -1,9 +1,11 @@
 package com.jdl.ghdata.githubapi.client;
 
+import com.jdl.ghdata.config.JacksonConfig;
 import com.jdl.ghdata.githubapi.config.GitHubApiCacheConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.CacheManager;
@@ -11,17 +13,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestClient;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-@SpringBootTest(classes = {GitHubApiCacheConfig.class, GitHubApiClient.class})
+@SpringBootTest(classes = {GitHubApiCacheConfig.class, GitHubApiClient.class, JacksonConfig.class})
 @Import(GitHubApiClientCachingTest.MockRestClientConfig.class)
 class GitHubApiClientCachingTest {
 
@@ -89,8 +93,16 @@ class GitHubApiClientCachingTest {
     static class MockRestClientConfig {
 
         @Bean
-        RestClient.Builder githubRestClientBuilder() {
-            return RestClient.builder().baseUrl("https://api.github.com");
+        RestClient.Builder githubRestClientBuilder(JsonMapperBuilderCustomizer jsonMapperBuilderCustomizer) {
+            JsonMapper.Builder jsonMapperBuilder = JsonMapper.builder();
+            jsonMapperBuilderCustomizer.customize(jsonMapperBuilder);
+            JsonMapper jsonMapper = jsonMapperBuilder.build();
+
+            return RestClient.builder()
+                    .baseUrl("https://api.github.com")
+                    .configureMessageConverters(converters -> converters
+                            .withJsonConverter(new JacksonJsonHttpMessageConverter(jsonMapper))
+                            .registerDefaults());
         }
 
         @Bean

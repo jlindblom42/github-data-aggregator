@@ -1,5 +1,6 @@
 package com.jdl.ghdata.core.controller;
 
+import com.jdl.ghdata.config.JacksonConfig;
 import com.jdl.ghdata.core.dto.UserRepoDto;
 import com.jdl.ghdata.core.dto.UserReposResponseDto;
 import com.jdl.ghdata.core.service.UserService;
@@ -8,6 +9,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,6 +23,7 @@ import java.util.List;
 import static org.mockito.BDDMockito.given;
 
 @WebMvcTest(UserController.class)
+@Import(JacksonConfig.class)
 class UserControllerTest {
 
     @Autowired
