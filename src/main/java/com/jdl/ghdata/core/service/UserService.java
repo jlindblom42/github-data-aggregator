@@ -5,6 +5,7 @@ import com.jdl.ghdata.core.dto.UserReposResponseDto;
 import com.jdl.ghdata.githubapi.client.GitHubApiClient;
 import com.jdl.ghdata.githubapi.dto.GitHubApiUserRepoResponseDto;
 import com.jdl.ghdata.githubapi.dto.GitHubApiUserResponseDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +15,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class UserService {
 
     private final GitHubApiClient githubApiClient;
-
-    public UserService(GitHubApiClient githubApiClient) {
-        this.githubApiClient = githubApiClient;
-    }
 
     public UserReposResponseDto getUserAndUserRepos(String username) {
         log.debug("Fetching GitHub user and user repos in parallel [username={}]", username);
