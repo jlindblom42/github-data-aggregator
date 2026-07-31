@@ -13,7 +13,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("GitHub Data Aggregator")
-                        .description("Combines a GitHub user's profile and public repositories into a single response.")
+                        .description("Service that surfaces endpoints facilitating GitHub data aggregation.")
                         .version("v1"));
     }
 }

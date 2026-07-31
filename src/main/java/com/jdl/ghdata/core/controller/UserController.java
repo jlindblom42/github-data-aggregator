@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
-@Tag(name = "Users", description = "Look up a GitHub user's profile combined with their public repositories.")
+@Tag(name = "Users", description = "Endpoints related to GitHub user lookup and aggregation.")
 public class UserController {
 
     private final UserService userService;
