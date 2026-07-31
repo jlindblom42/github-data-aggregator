@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 @Slf4j
 @Service
@@ -32,8 +33,17 @@ public class UserService {
         CompletableFuture<List<GitHubApiUserRepoResponseDto>> reposFuture =
                 CompletableFuture.supplyAsync(() -> githubApiClient.getUserRepos(username));
 
-        GitHubApiUserResponseDto user = userFuture.join();
-        List<GitHubApiUserRepoResponseDto> repos = reposFuture.join();
+        GitHubApiUserResponseDto user;
+        List<GitHubApiUserRepoResponseDto> repos;
+        try {
+            user = userFuture.join();
+            repos = reposFuture.join();
+        } catch (CompletionException e) {
+            if (e.getCause() instanceof RuntimeException re) {
+                throw re;
+            }
+            throw e;
+        }
 
         return new UserReposResponseDto(
                 user.login(),
