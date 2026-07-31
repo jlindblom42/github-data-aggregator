@@ -15,6 +15,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
+import java.time.Instant;
+
 import static org.mockito.BDDMockito.given;
 
 @WebMvcTest(UserController.class)
@@ -39,25 +41,55 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void otherClientErrorFromGitHubApi_returns502() throws Exception {
+    void tooManyRequestsFromGitHubApi_returns429() throws Exception {
+        HttpHeaders githubHeaders = new HttpHeaders();
+        githubHeaders.add(HttpHeaders.RETRY_AFTER, "30");
+        given(userService.getUserAndUserRepos("octocat")).willThrow(
+                HttpClientErrorException.create(HttpStatus.TOO_MANY_REQUESTS, "Too Many Requests", githubHeaders, null, null));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/octocat"))
+                .andExpect(MockMvcResultMatchers.status().isTooManyRequests())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(429))
+                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.RETRY_AFTER, "30"));
+    }
+
+    @Test
+    void tooManyRequestsFromGitHubApi_fallsBackToRateLimitResetHeader() throws Exception {
+        long resetEpochSeconds = Instant.now().plusSeconds(60).getEpochSecond();
+        HttpHeaders githubHeaders = new HttpHeaders();
+        githubHeaders.add("x-ratelimit-reset", String.valueOf(resetEpochSeconds));
+        given(userService.getUserAndUserRepos("octocat")).willThrow(
+                HttpClientErrorException.create(HttpStatus.TOO_MANY_REQUESTS, "Too Many Requests", githubHeaders, null, null));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/octocat"))
+                .andExpect(MockMvcResultMatchers.status().isTooManyRequests())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(429))
+                .andExpect(MockMvcResultMatchers.header().exists(HttpHeaders.RETRY_AFTER));
+    }
+
+    @Test
+    void otherClientErrorFromGitHubApi_passesThroughStatus() throws Exception {
         given(userService.getUserAndUserRepos("octocat")).willThrow(
                 HttpClientErrorException.create(HttpStatus.FORBIDDEN, "Forbidden", HttpHeaders.EMPTY, null, null));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/users/octocat"))
-                .andExpect(MockMvcResultMatchers.status().isBadGateway())
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(502));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(403))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Forbidden"));
     }
 
     @Test
-    void serverErrorFromGitHubApi_returns502() throws Exception {
+    void serverErrorFromGitHubApi_passesThroughStatus() throws Exception {
         given(userService.getUserAndUserRepos("octocat")).willThrow(
                 HttpServerErrorException.create(HttpStatus.SERVICE_UNAVAILABLE, "Service Unavailable", HttpHeaders.EMPTY, null, null));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/users/octocat"))
-                .andExpect(MockMvcResultMatchers.status().isBadGateway())
+                .andExpect(MockMvcResultMatchers.status().isServiceUnavailable())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(502));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(503))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Service Unavailable"));
     }
 
     @Test
