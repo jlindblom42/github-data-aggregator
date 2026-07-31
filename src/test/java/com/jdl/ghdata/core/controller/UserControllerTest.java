@@ -5,6 +5,7 @@ import com.jdl.ghdata.core.dto.UserRepoDto;
 import com.jdl.ghdata.core.dto.UserReposResponseDto;
 import com.jdl.ghdata.core.service.UserService;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,6 @@ import org.springframework.util.StreamUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static org.mockito.BDDMockito.given;
-
 @WebMvcTest(UserController.class)
 @Import(JacksonConfig.class)
 class UserControllerTest {
@@ -34,7 +33,7 @@ class UserControllerTest {
 
     @Test
     void getUserAndUserRepos_returnsUserAndReposJson() throws Exception {
-        given(userService.getUserAndUserRepos("octocat")).willReturn(new UserReposResponseDto(
+        BDDMockito.given(userService.getUserAndUserRepos("octocat")).willReturn(new UserReposResponseDto(
                 "octocat",
                 "The Octocat",
                 "https://avatars.githubusercontent.com/u/583231?v=4",

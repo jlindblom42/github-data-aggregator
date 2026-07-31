@@ -3,6 +3,7 @@ package com.jdl.ghdata.githubapi.client;
 import com.jdl.ghdata.githubapi.config.GitHubApiCacheConfig;
 import com.jdl.ghdata.githubapi.dto.GitHubApiUserRepoResponseDto;
 import com.jdl.ghdata.githubapi.dto.GitHubApiUserResponseDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
@@ -14,14 +15,11 @@ import java.util.Collections;
 import java.util.List;
 
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class GitHubApiClient {
 
     private final RestClient githubRestClient;
-
-    public GitHubApiClient(RestClient githubRestClient) {
-        this.githubRestClient = githubRestClient;
-    }
 
     @Cacheable(GitHubApiCacheConfig.USER_CACHE)
     public GitHubApiUserResponseDto getUser(String username) {
