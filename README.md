@@ -26,66 +26,14 @@ below (that also serves as an example):
 
 The response above is produced by calling the username against GitHub's user and repos APIs, then merging the results.
 
-## API Usage
+## API Documentation
 
-### Get user and repos
+Interactive OpenAPI/Swagger docs are available once the application is running:
 
-Retrieves a GitHub user's profile combined with their public repositories.
-
-```
-GET /users/{username}
-```
-
-**Path parameters**
-
-| Name       | Description                     |
-|------------|---------------------------------|
-| `username` | The GitHub username to look up. |
-
-**Example request**
-
-```bash
-curl.exe -s http://localhost:8080/users/octocat | ConvertFrom-Json | ConvertTo-Json -Depth 100
-```
-
-**Example response** — `200 OK`
-
-```json
-{
-  "user_name": "octocat",
-  "display_name": "The Octocat",
-  "avatar": "https://avatars.githubusercontent.com/u/583231?v=4",
-  "geo_location": "San Francisco",
-  "email": null,
-  "url": "https://api.github.com/users/octocat",
-  "created_at": "Tue, 25 Jan 2011 18:44:36 GMT",
-  "repos": [
-    {
-      "name": "boysenberry-repo-1",
-      "url": "https://api.github.com/repos/octocat/boysenberry-repo-1"
-    }
-  ]
-}
-```
-
-**Error responses**
-
-Errors are returned as JSON in the following structure:
-
-```json
-{
-  "status": 404,
-  "error": "Not Found",
-  "message": "The requested GitHub resource was not found."
-}
-```
-
-| Status | Condition                                                       |
-|--------|-----------------------------------------------------------------|
-| `404`  | The GitHub user does not exist (or the resource was not found). |
-| `502`  | GitHub rejected the request or returned a server error.         |
-| `503`  | The GitHub API could not be reached.                            |
-| `500`  | An unexpected error occurred.                                   |
+| Resource     | URL                                   |
+|--------------|---------------------------------------|
+| Swagger UI   | http://localhost:8080/swagger-ui.html |
+| OpenAPI JSON | http://localhost:8080/v3/api-docs     |
 
 ## Data sources
 
@@ -154,9 +102,15 @@ a frequent enough issue.
 
 ## Future thoughts
 
-I didn't want to go too crazy with this out of respect for time, but there are a couple items that I would have looked at implementing next:
-* It wasn't requested by the customer but some form of authentication would be desirable from our perspective, as it would help gate the API to only the authorized users we have approved.  I.e. someone wouldn't be able to exhaust our rate limit constraints maliciously.
-* Swagger/OpenAPI Docs would have been a great add for the customer's benefit.  Gives them a UI that they can refer to for API documentation and testing.
-* Validation that the GitHub user exists as a first step would be helpful, if such an API/methodology exists.  I have to imagine it does in some form, just didn't see an easy way with the API calls targeted.
-* Exposing an API client module would have been a nice add assuming the customer is amenable to a SDK artifact as a deliverable.  Would have leaned on feign client as that's what I have the most experience with.
-* Need to confirm with customer that the caching considerations are sufficient for their purposes.  They may need something that's more "realtime" than the 1 minute ttl we put in place initially. 
+I didn't want to go too crazy with this out of respect for time, but there are a couple items that I would have looked
+at implementing next:
+
+* It wasn't requested by the customer but some form of authentication would be desirable from our perspective, as it
+  would help gate the API to only the authorized users we have approved. I.e. someone wouldn't be able to exhaust our
+  rate limit constraints maliciously.
+* Validation that the GitHub user exists as a first step would be helpful, if such an API/methodology exists. I have to
+  imagine it does in some form, just didn't see an easy way with the API calls targeted.
+* Exposing an API client module would have been a nice add assuming the customer is amenable to a SDK artifact as a
+  deliverable. Would have leaned on feign client as that's what I have the most experience with.
+* Need to confirm with customer that the caching considerations are sufficient for their purposes. They may need
+  something that's more "realtime" than the 1 minute ttl we put in place initially. 
